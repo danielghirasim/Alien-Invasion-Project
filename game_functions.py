@@ -32,6 +32,9 @@ def check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_
         stats.reset_stats()
         stats.game_active = True
 
+        # Reset game settings
+        my_settings.initialize_dynamic_settings()
+
         # Empty the list of aliens and bullets
         bullets.empty()
         aliens.empty()
@@ -50,6 +53,9 @@ def start_game(stats, bullets, aliens, my_settings, my_ship, screen):
         # Reset the game statistics
         stats.reset_stats()
         stats.game_active = True
+
+        # Reset game settings
+        my_settings.initialize_dynamic_settings()
 
         # Empty the list of aliens and bullets
         bullets.empty()
@@ -192,6 +198,9 @@ def get_number_rows(my_settings, ship_height, alien_height):
 def check_keydown_events(event, my_ship, screen, my_settings, bullets,stats,aliens):
     """Checks for KEY_DOWN events"""
     if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_p:
+            start_game(stats, bullets, aliens, my_settings, my_ship, screen)
+    if event.type == pygame.KEYDOWN and stats.game_active:
         if event.key == pygame.K_RIGHT:
             my_ship.moving_right = True
         if event.key == pygame.K_LEFT:
@@ -200,8 +209,7 @@ def check_keydown_events(event, my_ship, screen, my_settings, bullets,stats,alie
             sys.exit()
         if event.key == pygame.K_SPACE:
             shoot_bullet(bullets, my_settings, my_ship, screen)
-        if event.key == pygame.K_p:
-            start_game(stats, bullets, aliens, my_settings, my_ship, screen)
+
 
 
 def check_keyup_events(event, my_ship):
@@ -245,4 +253,5 @@ def check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen):
     if len(aliens) == 0:
         # Destroy existing bullets and create new fleet
         bullets.empty()
+        my_settings.increase_speed()
         create_fleet(my_settings, my_ship, screen, aliens)
