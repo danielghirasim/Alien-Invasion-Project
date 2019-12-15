@@ -24,7 +24,7 @@ def run_game():
     stats = Stats(my_settings)
 
     while True:
-        gf.check_event(my_ship, screen, my_settings, bullets, stats, play_button)
+        gf.check_event(my_ship, screen, my_settings, bullets, stats, play_button,aliens)
         if stats.game_active:
             gf.check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets)
             gf.update_aliens(my_settings, aliens, my_ship, stats, screen, bullets)

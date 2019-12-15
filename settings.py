@@ -16,7 +16,7 @@ class Settings():
         self.bullet_height = 25
         self.bullet_color = (255, 255, 255)
         self.bullet_speed_factor = 5
-        self.miss_limit = 10
+        self.miss_limit = 1 # Default 5
         self.miss_count = 0
 
         # Alien settings

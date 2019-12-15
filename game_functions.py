@@ -9,7 +9,7 @@ from bullet import Bullet
 """A module that has different functions for the game"""
 
 
-def check_event(my_ship, screen, my_settings, bullets, stats, play_button):
+def check_event(my_ship, screen, my_settings, bullets, stats, play_button,aliens):
     """Checks for Keyboard,Mouse events"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -18,13 +18,24 @@ def check_event(my_ship, screen, my_settings, bullets, stats, play_button):
         check_keyup_events(event, my_ship)
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(stats, play_button, mouse_x, mouse_y)
+            check_play_button(stats, play_button, mouse_x, mouse_y,bullets,aliens,my_settings,my_ship,screen)
 
 
-def check_play_button(stats, play_button, mouse_x, mouse_y):
+def check_play_button(stats, play_button, mouse_x, mouse_y,bullets,aliens,my_settings,my_ship,screen):
     """Start a new game when the player click Play"""
     if play_button.rect.collidepoint(mouse_x, mouse_y):
+        #Reset the game statistics
+        stats.reset_stats()
         stats.game_active = True
+
+        # Empty the list of aliens and bullets
+        bullets.empty()
+        aliens.empty()
+
+        #Create a new fleet and center the ship
+        create_fleet(my_settings,my_ship,screen,aliens)
+        my_ship.center_ship()
+
 
 
 def display_update(screen, my_ship, my_settings, bullets, aliens, my_background, play_button, stats):
