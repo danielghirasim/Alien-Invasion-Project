@@ -14,7 +14,7 @@ def check_event(my_ship, screen, my_settings, bullets, stats, play_button, alien
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-        check_keydown_events(event, my_ship, screen, my_settings, bullets,stats,aliens)
+        check_keydown_events(event, my_ship, screen, my_settings, bullets, stats, aliens)
         check_keyup_events(event, my_ship)
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -66,7 +66,7 @@ def start_game(stats, bullets, aliens, my_settings, my_ship, screen):
         my_ship.center_ship()
 
 
-def display_update(screen, my_ship, my_settings, bullets, aliens, my_background, play_button, stats):
+def display_update(screen, my_ship, my_settings, bullets, aliens, my_background, play_button, stats, sb):
     """Updates the screen with ship , bullets , etc"""
     screen.fill(my_settings.bg_color)
     screen.blit(my_background, (0, 0))
@@ -78,6 +78,9 @@ def display_update(screen, my_ship, my_settings, bullets, aliens, my_background,
     # This draws my bullets on the screen because I fked something up I had to put it here
     for each in bullets.sprites():
         each.draw_bullets()
+
+    # Draw the score information.
+    sb.show_score()
 
     # Draw the play button if game is inactive.
     if not stats.game_active:
@@ -195,7 +198,7 @@ def get_number_rows(my_settings, ship_height, alien_height):
     return number_rows
 
 
-def check_keydown_events(event, my_ship, screen, my_settings, bullets,stats,aliens):
+def check_keydown_events(event, my_ship, screen, my_settings, bullets, stats, aliens):
     """Checks for KEY_DOWN events"""
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_p:
@@ -209,7 +212,6 @@ def check_keydown_events(event, my_ship, screen, my_settings, bullets,stats,alie
             sys.exit()
         if event.key == pygame.K_SPACE:
             shoot_bullet(bullets, my_settings, my_ship, screen)
-
 
 
 def check_keyup_events(event, my_ship):
@@ -234,21 +236,26 @@ def shoot_bullet(bullets, my_settings, my_ship, screen):
         bullets.add(new_bullet)
 
 
-def update_bullets(aliens, bullets, my_settings, my_ship, screen):
+def update_bullets(aliens, bullets, my_settings, my_ship, screen, stats, sb):
     """Update position of bullets and get rid of old bullets."""
     for bullet in bullets.sprites():
         bullet.draw_bullets()
         remove_old_bullets(bullet, bullets, my_ship)
 
-    check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen)
+    check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen, stats, sb)
 
 
-def check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen):
+def check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen, stats, sb):
     # Check for any bullet if it has hit an alien
     # If so , get rid of the bullet and alien
     # And make a new fleet of aliens
 
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if collisions:
+        for aliens in collisions.values():
+            stats.score += my_settings.alien_points * len(aliens)
+            sb.prep_score()
 
     if len(aliens) == 0:
         # Destroy existing bullets and create new fleet

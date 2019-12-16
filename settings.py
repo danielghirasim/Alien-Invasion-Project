@@ -11,7 +11,7 @@ class Settings():
         self.ship_limit = 3
 
         # Bullet Settings
-        self.bullet_width = 5
+        self.bullet_width = 255
         self.bullet_height = 25
         self.bullet_color = (255, 255, 255)
         self.miss_limit = 25 # Default 5
@@ -22,6 +22,9 @@ class Settings():
 
         # How quickly the game speeds up
         self.speed_up_scale = 1.1
+
+        # Score scaling
+        self.score_up_scale = 1.5
 
         self.initialize_dynamic_settings()
 
@@ -34,10 +37,15 @@ class Settings():
         # fleet_direction of 1 is represents right -1 represents left
         self.fleet_direction = 1
 
+        # Scoring
+        self.alien_points = 50
+
+
     def increase_speed(self):
         self.ship_speed_factor *= self.speed_up_scale
         self.bullet_speed_factor *= self.speed_up_scale
         self.alien_speed_factor *= self.speed_up_scale
+        self.alien_points = int(self.score_up_scale * self.alien_points)
 
     def reset_to_default(self):
         """Resets the settings to default after testing"""

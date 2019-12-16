@@ -13,3 +13,4 @@ class Stats():
         """Init statistics that can change during the game."""
         self.ships_left = self.settings.ship_limit
         self.miss_left = self.settings.miss_limit
+        self.score = 0
