@@ -25,10 +25,10 @@ def run_game():
     sb = Scoreboard(my_settings, screen, stats, my_background)
 
     while True:
-        gf.check_event(my_ship, screen, my_settings, bullets, stats, play_button, aliens)
+        gf.check_event(my_ship, screen, my_settings, bullets, stats, play_button, aliens, sb)
         if stats.game_active:
-            gf.check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets)
-            gf.update_aliens(my_settings, aliens, my_ship, stats, screen, bullets)
+            gf.check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets, sb)
+            gf.update_aliens(my_settings, aliens, my_ship, stats, screen, bullets, sb)
             gf.update_bullets(aliens, bullets, my_settings, my_ship, screen, stats, sb)
 
         gf.display_update(screen, my_ship, my_settings, bullets, aliens, my_background, play_button, stats,sb)

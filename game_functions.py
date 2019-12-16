@@ -9,7 +9,7 @@ from bullet import Bullet
 """A module that has different functions for the game"""
 
 
-def check_event(my_ship, screen, my_settings, bullets, stats, play_button, aliens):
+def check_event(my_ship, screen, my_settings, bullets, stats, play_button, aliens, sb):
     """Checks for Keyboard,Mouse events"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -18,10 +18,10 @@ def check_event(my_ship, screen, my_settings, bullets, stats, play_button, alien
         check_keyup_events(event, my_ship)
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_settings, my_ship, screen)
+            check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_settings, my_ship, screen, sb)
 
 
-def check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_settings, my_ship, screen):
+def check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_settings, my_ship, screen,sb):
     """Start a new game when the player click Play"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:  # 'Not stats.game_active' = you can only click it when the game is not active
@@ -31,6 +31,12 @@ def check_play_button(stats, play_button, mouse_x, mouse_y, bullets, aliens, my_
         # Reset the game statistics
         stats.reset_stats()
         stats.game_active = True
+
+        # Reset scoreboard images
+        sb.prep_score()
+        sb.prep_high_score()
+        sb.prep_level()
+        sb.prep_ships()
 
         # Reset game settings
         my_settings.initialize_dynamic_settings()
@@ -103,29 +109,29 @@ def create_fleet(my_settings, my_ship, screen, aliens):
             create_alien(screen, my_settings, aliens, alien_number, row_number)
 
 
-def update_aliens(my_settings, aliens, my_ship, stats, screen, bullets):
+def update_aliens(my_settings, aliens, my_ship, stats, screen, bullets, sb):
     """Check if the fleet is at an edge and the update position
     of all aliens in the fleet"""
     check_fleet_edges(my_settings, aliens)
     aliens.update()
-    check_aliens_hit_bottom(my_settings, stats, screen, my_ship, aliens, bullets)
+    check_aliens_hit_bottom(my_settings, stats, screen, my_ship, aliens, bullets, sb)
     # Look for Ship - Alien collision
     if pygame.sprite.spritecollideany(my_ship, aliens):
-        ship_hit(my_settings, stats, screen, my_ship, aliens, bullets)
+        ship_hit(my_settings, stats, screen, my_ship, aliens, bullets, sb)
         print("Ship Hit!!")
 
 
-def check_aliens_hit_bottom(my_settings, stats, screen, my_ship, aliens, bullets):
+def check_aliens_hit_bottom(my_settings, stats, screen, my_ship, aliens, bullets , sb):
     """Check if any aliens hit the bottom of the screen"""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         """Treat it the same way as if ship is hit"""
         if alien.rect.bottom >= screen_rect.bottom:
-            ship_hit(my_settings, stats, screen, my_ship, aliens, bullets)
+            ship_hit(my_settings, stats, screen, my_ship, aliens, bullets, sb)
             break
 
 
-def check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets):
+def check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets,sb):
     """We check if the bullets top rect is lower that screen_top rect
     if it is then we increment miss count with 1 if it reaches 3 we register
     it as a ship_hit and reset."""
@@ -134,21 +140,26 @@ def check_bullet_misses(my_settings, stats, screen, my_ship, aliens, bullets):
         if bullet.rect.top < screen_rect.top:
             my_settings.miss_count += 1
             if my_settings.miss_count > my_settings.miss_limit:
-                ship_hit(my_settings, stats, screen, my_ship, aliens, bullets)
+                ship_hit(my_settings, stats, screen, my_ship, aliens, bullets, sb)
 
 
-def ship_hit(my_settings, stats, screen, my_ship, aliens, bullets):
+def ship_hit(my_settings, stats, screen, my_ship, aliens, bullets, sb):
     """Respond to ship being hit by alien
     + I added bullet miss limit """
     if stats.ships_left > 0 and stats.miss_left > 0:
         # Decrement ships_left
         stats.ships_left -= 1
         stats.miss_left -= 1
+        stats.ships_left -= 1
         my_settings.miss_count = 0
 
         # Empty the list of aliens and bullets
         aliens.empty()
         bullets.empty()
+
+        # Preps ships image after ship was hit
+        sb.prep_ships()
+
 
         # Create a new fleet and center the ship
         create_fleet(my_settings, my_ship, screen, aliens)
@@ -258,6 +269,7 @@ def check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen, 
             sb.prep_score()
         check_high_score(sb, stats)
         display_level(sb)
+        sb.prep_ships()
 
     if len(aliens) == 0:
         # Destroy existing bullets and create new fleet
