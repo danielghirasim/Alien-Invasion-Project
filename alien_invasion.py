@@ -22,7 +22,7 @@ def run_game():
     aliens = Group()
     gf.create_fleet(my_settings, my_ship, screen, aliens)
     stats = Stats(my_settings)
-    sb = Scoreboard(my_settings,screen,stats)
+    sb = Scoreboard(my_settings, screen, stats, my_background)
 
     while True:
         gf.check_event(my_ship, screen, my_settings, bullets, stats, play_button, aliens)

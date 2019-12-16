@@ -256,9 +256,28 @@ def check_bullet_alien_collision(bullets, aliens, my_settings, my_ship, screen, 
         for aliens in collisions.values():
             stats.score += my_settings.alien_points * len(aliens)
             sb.prep_score()
+        check_high_score(sb, stats)
+        display_level(sb)
 
     if len(aliens) == 0:
         # Destroy existing bullets and create new fleet
         bullets.empty()
+        # Increases game speed
         my_settings.increase_speed()
+        # Increments level by 1
+        increment_level(stats)
+        # Creates new fleet
         create_fleet(my_settings, my_ship, screen, aliens)
+
+def check_high_score(sb,stats):
+    """Check to see if there is any new highscore"""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
+
+def display_level(sb):
+    """Displays level"""
+    sb.prep_level()
+
+def increment_level(stats):
+    stats.level += 1
